@@ -1,0 +1,68 @@
+# xdpfw controller configuration.
+#
+# Each plugin has its own section under "plugins.<type>.<name>".
+# Known types this build understands: "monitoring", "bpf".
+
+log:
+  # logging format could be "string" or "json"
+  format: "string"
+
+  # "stdout" - output to console, or a log path like
+  # "/var/log/xdpfw/xdpfw.log"
+  log: "stdout"
+
+  # level could be "debug" or "info"; overridable with --debug
+  level: "debug"
+
+controller:
+  api:
+    # http api listen address, form "[::1]:5055"
+    listen: "[::1]:5055"
+
+    # echo server debug output
+    debug: false
+
+plugins:
+
+  # monitoring plugins: metrics store / aggregation / export
+  monitoring:
+    metrics:
+      enabled: true
+
+  # bpf plugins: load/unload the xdp program, manage its maps
+  bpf:
+    firewall:
+      enabled: true
+
+      controls:
+        # mount bpffs at /sys/fs/bpf if the OS did not (containers)
+        bpffs: false
+        # set RLIMIT_MEMLOCK to infinity (older kernels / LPM_TRIE)
+        unlimit-memlock: true
+
+      options:
+        # interface to attach the xdp program to
+        interface: "lo"
+
+        # compiled bpf object
+        path: "bpf/xdpfw.bpf.o"
+
+        # bpffs pin path for maps and the pinned link
+        pinpath: "/sys/fs/bpf/xdpfw"
+
+        # load-time dryrun: count matches but never drop
+        dryrun: false
+
+        # populate the xdpfw_metrics counter array
+        metrics: true
+
+        # populate the xdpfw_perf packet-size histogram
+        perf: true
+
+      loader:
+        # "primary" (attach to the interface), "secondary"
+        # (register into an existing hook map) or "auto"
+        mode: "auto"
+        hook:
+          pinpath: ""
+          index: []

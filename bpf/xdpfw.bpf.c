@@ -17,10 +17,6 @@
 //   xdpfw_perf                    ARRAY u64     packet-size histogram
 //   xdpfw_runtime_config          ARRAY u32     runtime dryrun toggle
 //
-// The header-parsing style, pinned BTF-defined maps and per-CPU counter
-// pattern follow bpf/yadns-xdp.bpf.c from the yadns-controller project,
-// reworked here as a plain firewall with no packet rewriting.
-//
 
 #include "xdpfw.bpf.h"
 

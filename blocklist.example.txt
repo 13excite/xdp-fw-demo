@@ -1,0 +1,20 @@
+# xdp-fw-demo blocklist
+#
+# One entry per line: an IP address or a CIDR prefix.
+# Blank lines and text after '#' are ignored.
+#
+# Allowed prefix lengths:
+#   IPv4 : /16 .. /32   (a bare IPv4 address means /32)
+#   IPv6 : /64 .. /128  (a bare IPv6 address means /128)
+#
+# Entries match the SOURCE address of incoming packets.
+
+# --- IPv4 ---
+203.0.113.7
+198.51.100.0/24
+192.0.2.0/24
+10.13.0.0/16
+
+# --- IPv6 ---
+2001:db8:dead:beef::1
+2001:db8:1234::/64
