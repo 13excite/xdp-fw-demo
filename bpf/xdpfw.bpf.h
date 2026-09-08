@@ -26,16 +26,45 @@
 #define BPF_F_NO_PREALLOC (1U << 0)
 #endif
 
-// stat slots in the xdpfw_stats per-CPU array (keep in sync with main.go)
+// Maps are either anonymous or pinned by name. The user-space loader
+// expects pinned maps, so the project Makefile builds with
+// -D_PINNED_MAP; a bare "make -C bpf" builds anonymous maps.
+#ifdef _PINNED_MAP
+#define XDPFW_PIN __uint(pinning, LIBBPF_PIN_BY_NAME)
+#else
+#define XDPFW_PIN
+#endif
+
+// xdpfw_stats: per-CPU counters, read back by "xdpfw firewall stats".
+// (keep in sync with pkg/plugins/firewall/maps.go)
 #define STAT_PKTS_TOTAL 0
 #define STAT_IPV4_MATCH 1
 #define STAT_IPV6_MATCH 2
 #define STAT_PASSED 3
 #define STAT_SLOTS 8
 
+// xdpfw_metrics: plain u64 array of counters.
+// (keep in sync with pkg/plugins/firewall/maps.go)
+#define XDPFW_M_RX 0
+#define XDPFW_M_PASS 1
+#define XDPFW_M_DROP 2
+#define XDPFW_M_ERROR 3
+#define XDPFW_M_ALLOW_HIT 4
+#define XDPFW_M_BLOCK_V4 5
+#define XDPFW_M_BLOCK_V6 6
+#define XDPFW_M_SLOTS 64
+
+// xdpfw_perf: packet-size histogram, one bucket per power-of-two.
+#define XDPFW_PERF_SLOTS 64
+
+// xdpfw_runtime_config: u32 array set from user space at run time.
+#define XDPFW_CFG_DRYRUN 0
+#define XDPFW_CFG_SLOTS 16
+
 // LPM-trie keys: a u32 prefix length followed by the address bytes in
 // network byte order (most significant byte first), which is exactly how
-// addresses sit in the packet.
+// addresses sit in the packet. Used by both the blocklist and the
+// allowlist maps.
 struct lpm_v4_key {
     __u32 prefixlen;
     __u8 addr[4];

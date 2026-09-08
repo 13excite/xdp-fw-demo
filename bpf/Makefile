@@ -19,8 +19,14 @@ TARGET  := xdpfw.bpf.o
 SRC     := xdpfw.bpf.c
 HEADERS := xdpfw.bpf.h vmlinux.h
 
+# extra defines passed in from the top-level Makefile. The project
+# build passes PINNED_FLAGS=-D_PINNED_MAP so maps are pinned by name;
+# a bare "make -C bpf" builds anonymous maps.
+PINNED_FLAGS ?=
+
 CFLAGS := -g -O2 -Wall -Wno-unused-function -fno-stack-protector \
-          -target bpf -D__TARGET_ARCH_$(ARCH) -isystem $(LIBBPF_SRC)
+          -target bpf -D__TARGET_ARCH_$(ARCH) -isystem $(LIBBPF_SRC) \
+          $(PINNED_FLAGS)
 
 .PHONY: all clean
 all: $(TARGET)
